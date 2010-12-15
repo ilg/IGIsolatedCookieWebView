@@ -220,8 +220,10 @@ didReceiveResponse:(NSURLResponse *)response
 {
 //	NSLog(@"should be setting cookie with name '%@' and value '%@' for URL '%@'",
 //		  [cookie name], [cookie value], [url absoluteString]);
-	[cookieStore removeObject:cookie];
-	[cookieStore addObject:cookie];
+	if (cookie) {
+		[cookieStore removeObject:cookie];
+		[cookieStore addObject:cookie];
+	}
 	[self removeExpiredCookies];
 }
 
