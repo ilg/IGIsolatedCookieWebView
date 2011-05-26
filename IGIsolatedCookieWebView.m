@@ -45,13 +45,20 @@
 		  willSendRequest:(NSURLRequest *)request
 		 redirectResponse:(NSURLResponse *)redirectResponse
 		   fromDataSource:(WebDataSource *)dataSource;
+
 - (void)webView:(WebView *)sender
 	   resource:(id)identifier
 didReceiveResponse:(NSURLResponse *)response
  fromDataSource:(WebDataSource *)dataSource;
 
+- (NSArray *)cookies;
+
 - (void)setCookie:(NSHTTPCookie *)cookie;
 - (NSArray *)getCookieArrayForRequest:(NSURLRequest *)request;
+
+- (void)removeAllCookies;
+- (void)removeAllCookiesForHost:(NSString *)host;
+- (void)removeExpiredCookies;
 
 @end
 
@@ -77,9 +84,24 @@ didReceiveResponse:(NSURLResponse *)response
 	[self setResourceLoadDelegate:resourceLoadDelegate];
 }
 
+- (NSArray *)cookies
+{
+    return [(IGIsolatedCookieWebViewResourceLoadDelegate *)[self resourceLoadDelegate] cookies];
+}
+
 - (void)injectCookie:(NSHTTPCookie *)cookie
 {
 	[(IGIsolatedCookieWebViewResourceLoadDelegate *)[self resourceLoadDelegate] setCookie:cookie];
+}
+
+- (void)removeAllCookies
+{
+    [(IGIsolatedCookieWebViewResourceLoadDelegate *)[self resourceLoadDelegate] removeAllCookies];
+}
+
+- (void)removeAllCookiesForHost:(NSString *)host
+{
+    [(IGIsolatedCookieWebViewResourceLoadDelegate *)[self resourceLoadDelegate] removeAllCookiesForHost:host];
 }
 
 @end
@@ -205,6 +227,27 @@ didReceiveResponse:(NSURLResponse *)response
  fromDataSource:(WebDataSource *)dataSource
 {
 	[self pullCookiesFromResponse:response];
+}
+
+- (NSArray *)cookies
+{
+	return [[cookieStore copy] autorelease];
+}
+
+- (void) removeAllCookies
+{
+	for (NSHTTPCookie *aCookie in [NSArray arrayWithArray:cookieStore]) {
+        [cookieStore removeObject:aCookie];
+    }
+}
+
+- (void)removeAllCookiesForHost:(NSString *)host
+{
+	for (NSHTTPCookie *aCookie in [NSArray arrayWithArray:cookieStore]) {
+		if ([aCookie isForHost:host]) {
+			[cookieStore removeObject:aCookie];
+		}
+	}
 }
 
 - (void)removeExpiredCookies

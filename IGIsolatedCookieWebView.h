@@ -37,6 +37,11 @@
 
 }
 
+- (NSArray *)cookies;
+
 - (void)injectCookie:(NSHTTPCookie *)cookie;
+
+- (void)removeAllCookies;
+- (void)removeAllCookiesForHost:(NSString *)host;
 
 @end
