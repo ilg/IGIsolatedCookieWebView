@@ -171,7 +171,7 @@ didReceiveResponse:(NSURLResponse *)response
 {
 	self = [super init];
 	if (self) {
-		cookieStore = [[NSMutableArray arrayWithCapacity:0] retain];
+		cookieStore = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -236,9 +236,7 @@ didReceiveResponse:(NSURLResponse *)response
 
 - (void) removeAllCookies
 {
-	for (NSHTTPCookie *aCookie in [NSArray arrayWithArray:cookieStore]) {
-        [cookieStore removeObject:aCookie];
-    }
+	[cookieStore removeAllObjects];
 }
 
 - (void)removeAllCookiesForHost:(NSString *)host
@@ -272,7 +270,7 @@ didReceiveResponse:(NSURLResponse *)response
 
 - (NSArray *)getCookieArrayForRequest:(NSURLRequest *)request
 {
-	NSMutableArray *cookiesToSend = [NSMutableArray arrayWithCapacity:0];
+	NSMutableArray *cookiesToSend = [NSMutableArray array];
 	for (NSHTTPCookie *aCookie in cookieStore) {
 		if ([aCookie isForRequest:request]) {
 			[cookiesToSend addObject:aCookie];
